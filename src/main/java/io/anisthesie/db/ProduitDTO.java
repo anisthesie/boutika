@@ -1,5 +1,7 @@
 package io.anisthesie.db;
 
+import java.util.Random;
+
 public class ProduitDTO {
     private int id;
     private String nom;
@@ -29,5 +31,15 @@ public class ProduitDTO {
     @Override
     public String toString() {
         return nom + " - " + prix + "€ (Stock: " + stock + ")";
+    }
+
+    public String getCategorie() {
+        if(new Random().nextBoolean()) {
+            return "Boissons";
+        } else if(new Random().nextBoolean()) {
+            return "Alimentation";
+        } else {
+            return "Divers";
+        }
     }
 }
