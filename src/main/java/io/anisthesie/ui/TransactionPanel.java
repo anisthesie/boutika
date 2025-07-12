@@ -121,6 +121,7 @@ public class TransactionPanel extends JPanel {
     }
 
     private void annulerVente() {
+
     }
 
     private void ajouterAuPanier(ProduitDTO produit) {
