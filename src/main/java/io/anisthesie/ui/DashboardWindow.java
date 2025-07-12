@@ -4,6 +4,7 @@ import io.anisthesie.db.ProduitDAO;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -14,18 +15,21 @@ import java.util.TimerTask;
 public class DashboardWindow extends JFrame {
 
     private final ProduitDAO produitDAO;
+
     private final JTabbedPane tabbedPane = new JTabbedPane();
-    private int transactionCounter = 1;
-
-    private boolean isFullscreen = false;
-    private Rectangle windowedBounds;
-
     private final JLabel dateLabel = new JLabel();
     private final JLabel timeLabel = new JLabel();
 
+    private Rectangle windowedBounds;
+
+    private int transactionCounter = 1;
+    private boolean isFullscreen = false;
+
+
     public DashboardWindow(Connection conn) throws SQLException {
         this.produitDAO = new ProduitDAO(conn);
-        setTitle("OptiGest - Gestion Commerciale");
+        setTitle("Boutika - Gestion Commerciale");
+        setSize(1000, 562);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         initUI();
@@ -33,22 +37,70 @@ public class DashboardWindow extends JFrame {
     }
 
     private void initUI() {
-        // === Gros boutons ===
-        JButton btnNew = createButton("Nouvelle Vente", new Color(46, 204, 113), 32, 240);
-        JButton btnStock = createButton("Historique des ventes", new Color(52, 152, 219), 20, 60);
-        JButton btnPrint = createButton("Imprimer Journée", new Color(241, 196, 15), 20, 60);
-        JButton btnExport = createButton("Ajouter Stock", new Color(155, 89, 182), 20, 60);
+        JPanel buttonPanel = initLeftPanel();
 
-        btnNew.addActionListener(e -> openNewTransactionTab());
-        btnStock.addActionListener(e -> JOptionPane.showMessageDialog(this, "TODO: Ajouter stock"));
-        btnPrint.addActionListener(e -> JOptionPane.showMessageDialog(this, "TODO: Imprimer journée"));
-        btnExport.addActionListener(e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
+        // === Onglets à droite ===
+        tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 18));
+
+        JSplitPane horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buttonPanel, tabbedPane);
+
+
+        horizontalSplit.setResizeWeight(0);
+        horizontalSplit.setDividerSize(4);
+
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(horizontalSplit, BorderLayout.CENTER);
+    }
+
+    private JPanel initLeftPanel() {
+        // === Gros boutons ===
+        JButton btnNew = createButton("Nouvelle Vente", new Color(46, 204, 113), 32, 240,e -> openNewTransactionTab());
+        JButton btnStock = createButton("Historique des ventes", new Color(52, 152, 219), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Ajouter stock"));
+        JButton btnPrint = createButton("Imprimer Journée", new Color(241, 196, 15), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Imprimer journée"));
+        JButton btnExport = createButton("Ajouter Stock", new Color(155, 89, 182), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
 
         // === Horloge ===
-        dateLabel.setFont(new Font("SansSerif", Font.BOLD, 36));
+        JPanel clockPanel = initClockPanel();
+
+        // === Bouton plein écran ===
+        JButton fullscreenBtn = initFullscreenBtn();
+
+
+        // === Panel gauche avec tous les boutons + horloge + plein écran ===
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        leftPanel.add(btnNew);
+        leftPanel.add(Box.createVerticalStrut(20));
+        leftPanel.add(btnStock);
+        leftPanel.add(Box.createVerticalStrut(10));
+        leftPanel.add(btnPrint);
+        leftPanel.add(Box.createVerticalStrut(10));
+        leftPanel.add(btnExport);
+        leftPanel.add(Box.createVerticalStrut(30));
+        leftPanel.add(clockPanel);
+        leftPanel.add(Box.createVerticalStrut(30));
+        leftPanel.add(fullscreenBtn, BorderLayout.SOUTH);
+        return leftPanel;
+    }
+
+    private JButton initFullscreenBtn() {
+        JButton fullscreenBtn = new JButton("🗖 Plein écran");
+        fullscreenBtn.setFocusPainted(false);
+        fullscreenBtn.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        fullscreenBtn.setBackground(new Color(44, 62, 80));
+        fullscreenBtn.setForeground(Color.WHITE);
+        fullscreenBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        fullscreenBtn.addActionListener(e -> toggleFullscreen(fullscreenBtn));
+        toggleFullscreen(fullscreenBtn);
+        return fullscreenBtn;
+    }
+
+    private JPanel initClockPanel() {
+        dateLabel.setFont(new Font("SansSerif", Font.BOLD, 26));
         dateLabel.setForeground(Color.WHITE);
         dateLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        timeLabel.setFont(new Font("SansSerif", Font.BOLD, 36));
+        timeLabel.setFont(new Font("SansSerif", Font.BOLD, 26));
         timeLabel.setForeground(Color.WHITE);
         timeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -59,41 +111,7 @@ public class DashboardWindow extends JFrame {
         clockPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         clockPanel.add(dateLabel);
         clockPanel.add(timeLabel);
-
-        // === Bouton plein écran ===
-        JButton fullscreenBtn = new JButton("🗖 Plein écran");
-        fullscreenBtn.setFocusPainted(false);
-        fullscreenBtn.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        fullscreenBtn.setBackground(new Color(44, 62, 80));
-        fullscreenBtn.setForeground(Color.WHITE);
-        fullscreenBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        fullscreenBtn.addActionListener(e -> toggleFullscreen(fullscreenBtn));
-
-        // === Panel gauche avec tous les boutons + horloge + plein écran ===
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
-        buttonPanel.add(btnNew);
-        buttonPanel.add(Box.createVerticalStrut(20));
-        buttonPanel.add(btnStock);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(btnPrint);
-        buttonPanel.add(Box.createVerticalStrut(10));
-        buttonPanel.add(btnExport);
-        buttonPanel.add(Box.createVerticalStrut(30));
-        buttonPanel.add(clockPanel);
-        buttonPanel.add(Box.createVerticalStrut(30));
-        buttonPanel.add(fullscreenBtn, BorderLayout.SOUTH);
-
-        // === Onglets à droite ===
-        tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 18));
-
-        JSplitPane horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buttonPanel, tabbedPane);
-        horizontalSplit.setResizeWeight(0);
-        horizontalSplit.setDividerSize(4);
-
-        getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(horizontalSplit, BorderLayout.CENTER);
+        return clockPanel;
     }
 
     private JButton createButton(String text, Color color, int fontSize, int height) {
@@ -107,6 +125,13 @@ public class DashboardWindow extends JFrame {
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
         return btn;
     }
+
+    private JButton createButton(String text, Color color, int fontSize, int height, ActionListener actionListener) {
+        JButton btn = createButton(text, color, fontSize, height);
+        btn.addActionListener(actionListener);
+        return btn;
+    }
+
 
     private void openNewTransactionTab() {
         String tabName = "Client " + transactionCounter++;
@@ -124,13 +149,15 @@ public class DashboardWindow extends JFrame {
             setUndecorated(true);
             setVisible(true);
             setBounds(gd.getDefaultConfiguration().getBounds());
-            btn.setText("🗗 Quitter plein écran");
+            if (btn != null)
+                btn.setText("🗗 Quitter plein écran");
         } else {
             dispose();
             setUndecorated(false);
             setBounds(windowedBounds != null ? windowedBounds : new Rectangle(100, 100, 1200, 800));
             setVisible(true);
-            btn.setText("🗖 Plein écran");
+            if (btn != null)
+                btn.setText("🗖 Plein écran");
         }
 
         isFullscreen = !isFullscreen;

@@ -1,6 +1,5 @@
 package io.anisthesie;
 
-import com.formdev.flatlaf.FlatSystemProperties;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import io.anisthesie.ui.DashboardWindow;
 
