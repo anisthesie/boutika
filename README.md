@@ -1,4 +1,11 @@
+![Statut](https://img.shields.io/badge/status-en%20cours-yellow)
+
+> ⚠️ Ce logiciel est encore en développement actif. Certaines fonctionnalités sont encore en cours de finalisation.
+---
+
 # Boutika
+
+
 
 **Boutika** est une application de gestion de point de vente locale, moderne et légère, développée en Java Swing. Elle combine une interface fluide (FlatLaf), une base de données SQLite sécurisée (via SQLCipher), et une architecture propre (DAO/DTO) compatible avec Java 17+.
 
