@@ -6,6 +6,7 @@ import io.anisthesie.ui.layout.WrapLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.sql.SQLException;
@@ -18,9 +19,11 @@ public class TransactionPanel extends JPanel {
     private final JPanel panierPanel = new JPanel();
     private final JLabel totalLabel = new JLabel("Total : 0 DA");
     private final Map<ProduitDTO, Integer> panier = new LinkedHashMap<>();
+    private final DashboardWindow parentWindow;
 
-    public TransactionPanel(ProduitDAO produitDAO) {
+    public TransactionPanel(ProduitDAO produitDAO, DashboardWindow parentWindow) {
         this.produitDAO = produitDAO;
+        this.parentWindow = parentWindow;
         setLayout(new BorderLayout());
         initUI();
     }
@@ -97,7 +100,7 @@ public class TransactionPanel extends JPanel {
         btnAnnuler.setFont(new Font("SansSerif", Font.BOLD, 20));
         btnAnnuler.setFocusPainted(false);
         btnAnnuler.setPreferredSize(new Dimension(380, 60));
-        btnAnnuler.addActionListener(e -> annulerVente());
+        btnAnnuler.addActionListener(this::annulerVente);
 
 
         JPanel basPanier = new JPanel(new BorderLayout());
@@ -120,9 +123,26 @@ public class TransactionPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    private void annulerVente() {
+    private void annulerVente(ActionEvent actionEvent) {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Voulez-vous vraiment annuler cette vente ?",
+                "Confirmation",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            JTabbedPane tabs = parentWindow.getTabbedPane();
+            int index = tabs.indexOfComponent(this);
+            if (index != -1) {
+                tabs.removeTabAt(index);
+            }
+
+        }
 
     }
+
 
     private void ajouterAuPanier(ProduitDTO produit) {
         panier.put(produit, panier.getOrDefault(produit, 0) + 1);

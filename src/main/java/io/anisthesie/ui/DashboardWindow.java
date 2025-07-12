@@ -135,7 +135,7 @@ public class DashboardWindow extends JFrame {
 
     private void openNewTransactionTab() {
         String tabName = "Client " + transactionCounter++;
-        JPanel panel = new TransactionPanel(this.produitDAO);
+        JPanel panel = new TransactionPanel(this.produitDAO, this);
         tabbedPane.addTab(tabName, panel);
         tabbedPane.setSelectedComponent(panel);
     }
@@ -175,5 +175,9 @@ public class DashboardWindow extends JFrame {
                 });
             }
         }, 0, 1000);
+    }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
     }
 }
