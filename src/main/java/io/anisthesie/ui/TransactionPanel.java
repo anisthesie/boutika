@@ -6,6 +6,8 @@ import io.anisthesie.ui.layout.WrapLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
@@ -46,6 +48,13 @@ public class TransactionPanel extends JPanel {
                 produitsPanel.add(lblCat);
 
                 JPanel catPanel = new JPanel(new WrapLayout());
+                catPanel.addComponentListener(new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        catPanel.revalidate();
+                        catPanel.repaint();
+                    }
+                });
                 for (ProduitDTO produit : entry.getValue()) {
                     JButton btn = new JButton("<html><center>" + produit.getNom() + "<br/>" + produit.getPrix() + " DA");
                     btn.setPreferredSize(new Dimension(150, 80));
