@@ -1,8 +1,9 @@
-package io.anisthesie.ui;
+package io.anisthesie.ui.panels;
 
 import io.anisthesie.db.dao.ProduitDAO;
 import io.anisthesie.db.dto.ProduitDTO;
 import io.anisthesie.db.service.VenteService;
+import io.anisthesie.ui.DashboardWindow;
 import io.anisthesie.ui.layout.WrapLayout;
 
 import javax.swing.*;

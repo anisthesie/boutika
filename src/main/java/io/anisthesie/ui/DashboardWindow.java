@@ -2,7 +2,10 @@ package io.anisthesie.ui;
 
 import io.anisthesie.db.dao.ProduitDAO;
 import io.anisthesie.db.dao.VenteDAO;
+import io.anisthesie.db.dao.VenteProduitsDAO;
 import io.anisthesie.db.service.VenteService;
+import io.anisthesie.ui.panels.HistoriqueVentesPanel;
+import io.anisthesie.ui.panels.TransactionPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +20,9 @@ import java.util.TimerTask;
 public class DashboardWindow extends JFrame {
 
     private final ProduitDAO produitDAO;
+    private final VenteDAO venteDAO;
+    private final VenteProduitsDAO venteProduitsDAO;
+
     private final VenteService venteService;
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
@@ -31,6 +37,9 @@ public class DashboardWindow extends JFrame {
 
     public DashboardWindow(Connection conn) throws SQLException {
         this.produitDAO = new ProduitDAO(conn);
+        this.venteDAO = new VenteDAO(conn);
+        this.venteProduitsDAO = new VenteProduitsDAO(conn);
+
         this.venteService = new VenteService(conn);
 
         setTitle("Boutika - Gestion Commerciale");
@@ -60,9 +69,9 @@ public class DashboardWindow extends JFrame {
     private JPanel initLeftPanel() {
         // === Gros boutons ===
         JButton btnNew = createButton("Nouvelle Vente", new Color(46, 204, 113), 32, 240,e -> openNewTransactionTab());
-        JButton btnStock = createButton("Historique des ventes", new Color(52, 152, 219), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Ajouter stock"));
+        JButton btnHistorique = createButton("Historique des ventes", new Color(52, 152, 219), 20, 60,e -> openHistoriqueTab());
         JButton btnPrint = createButton("Imprimer Journée", new Color(241, 196, 15), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Imprimer journée"));
-        JButton btnExport = createButton("Ajouter Stock", new Color(155, 89, 182), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
+        JButton btnStock = createButton("Ajouter Stock", new Color(155, 89, 182), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
 
         // === Horloge ===
         JPanel clockPanel = initClockPanel();
@@ -77,17 +86,18 @@ public class DashboardWindow extends JFrame {
         leftPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         leftPanel.add(btnNew);
         leftPanel.add(Box.createVerticalStrut(20));
-        leftPanel.add(btnStock);
+        leftPanel.add(btnHistorique);
         leftPanel.add(Box.createVerticalStrut(10));
         leftPanel.add(btnPrint);
         leftPanel.add(Box.createVerticalStrut(10));
-        leftPanel.add(btnExport);
+        leftPanel.add(btnStock);
         leftPanel.add(Box.createVerticalStrut(30));
         leftPanel.add(clockPanel);
         leftPanel.add(Box.createVerticalStrut(30));
         leftPanel.add(fullscreenBtn, BorderLayout.SOUTH);
         return leftPanel;
     }
+
 
     private JButton initFullscreenBtn() {
         JButton fullscreenBtn = new JButton("🗖 Plein écran");
@@ -135,6 +145,20 @@ public class DashboardWindow extends JFrame {
         JButton btn = createButton(text, color, fontSize, height);
         btn.addActionListener(actionListener);
         return btn;
+    }
+
+    public void openHistoriqueTab() {
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            Component tab = tabbedPane.getComponentAt(i);
+            if (tab instanceof HistoriqueVentesPanel) {
+                tabbedPane.setSelectedIndex(i);
+                return;
+            }
+        }
+
+        HistoriqueVentesPanel panel = new HistoriqueVentesPanel(venteDAO, venteProduitsDAO);
+        tabbedPane.addTab("Historique des ventes", panel);
+        tabbedPane.setSelectedComponent(panel);
     }
 
 
