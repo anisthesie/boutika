@@ -1,4 +1,6 @@
-package io.anisthesie.db;
+package io.anisthesie.db.dao;
+
+import io.anisthesie.db.dto.ProduitDTO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,16 +11,6 @@ public class ProduitDAO {
 
     public ProduitDAO(Connection conn) throws SQLException {
         this.conn = conn;
-        this.initTable();
-    }
-
-    private void initTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS produit (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "nom TEXT, prix REAL, stock INTEGER)";
-        try (Statement stmt = conn.createStatement()) {
-            stmt.execute(sql);
-        }
     }
 
     public void insertProduit(ProduitDTO p) throws SQLException {
@@ -46,4 +38,6 @@ public class ProduitDAO {
         }
         return produits;
     }
+
+
 }

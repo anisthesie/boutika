@@ -1,6 +1,7 @@
 package io.anisthesie;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import io.anisthesie.db.DatabaseInitializer;
 import io.anisthesie.ui.DashboardWindow;
 
 import javax.swing.*;
@@ -19,6 +20,7 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             try {
                 Connection conn = DriverManager.getConnection("jdbc:sqlite:gestion.db");
+                DatabaseInitializer.initTables(conn);
                 new DashboardWindow(conn).setVisible(true);
             } catch (SQLException e) {
                 e.printStackTrace();

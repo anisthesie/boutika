@@ -1,7 +1,8 @@
 package io.anisthesie.ui;
 
-import io.anisthesie.db.ProduitDAO;
-import io.anisthesie.db.ProduitDTO;
+import io.anisthesie.db.dao.ProduitDAO;
+import io.anisthesie.db.dto.ProduitDTO;
+import io.anisthesie.db.service.VenteService;
 import io.anisthesie.ui.layout.WrapLayout;
 
 import javax.swing.*;
@@ -16,13 +17,17 @@ import java.util.List;
 public class TransactionPanel extends JPanel {
 
     private final ProduitDAO produitDAO;
+    private final VenteService venteService;
+
     private final JPanel panierPanel = new JPanel();
     private final JLabel totalLabel = new JLabel("Total : 0 DA");
     private final Map<ProduitDTO, Integer> panier = new LinkedHashMap<>();
     private final DashboardWindow parentWindow;
 
-    public TransactionPanel(ProduitDAO produitDAO, DashboardWindow parentWindow) {
+
+    public TransactionPanel(ProduitDAO produitDAO, VenteService venteService, DashboardWindow parentWindow) {
         this.produitDAO = produitDAO;
+        this.venteService = venteService;
         this.parentWindow = parentWindow;
         setLayout(new BorderLayout());
         initUI();
@@ -123,27 +128,6 @@ public class TransactionPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    private void annulerVente(ActionEvent actionEvent) {
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Voulez-vous vraiment annuler cette vente ?",
-                "Confirmation",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            JTabbedPane tabs = parentWindow.getTabbedPane();
-            int index = tabs.indexOfComponent(this);
-            if (index != -1) {
-                tabs.removeTabAt(index);
-            }
-
-        }
-
-    }
-
-
     private void ajouterAuPanier(ProduitDTO produit) {
         panier.put(produit, panier.getOrDefault(produit, 0) + 1);
         rafraichirPanier();
@@ -215,15 +199,68 @@ public class TransactionPanel extends JPanel {
         totalLabel.setText("Total : " + String.format("%.2f", total) + " DA");
     }
 
+    private void annulerVente(ActionEvent actionEvent) {
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Voulez-vous vraiment annuler cette vente ?",
+                "Confirmation",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION)
+            fermerOnglet();
+
+
+    }
+
+    private void fermerOnglet() {
+        JTabbedPane tabs = parentWindow.getTabbedPane();
+        int index = tabs.indexOfComponent(this);
+        if (index != -1) {
+            tabs.removeTabAt(index);
+        }
+    }
+
     private void validerVente() {
         if (panier.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Aucun produit dans le panier.", "Erreur", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // TODO: enregistrer la vente dans la base de données (vente + vente_produits)
-        JOptionPane.showMessageDialog(this, "Vente enregistrée avec succès !");
-        panier.clear();
-        rafraichirPanier();
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Confirmer l'enregistrement de cette vente ?",
+                "Validation de vente",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) return;
+
+        try {
+            int venteId = venteService.validerVente(panier);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Vente enregistrée avec succès (ID #" + venteId + ").",
+                    "Succès",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+
+            panier.clear();
+            fermerOnglet();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erreur lors de l'enregistrement de la vente : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
+
+
 }

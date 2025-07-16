@@ -1,6 +1,8 @@
 package io.anisthesie.ui;
 
-import io.anisthesie.db.ProduitDAO;
+import io.anisthesie.db.dao.ProduitDAO;
+import io.anisthesie.db.dao.VenteDAO;
+import io.anisthesie.db.service.VenteService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,7 @@ import java.util.TimerTask;
 public class DashboardWindow extends JFrame {
 
     private final ProduitDAO produitDAO;
+    private final VenteService venteService;
 
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final JLabel dateLabel = new JLabel();
@@ -28,6 +31,8 @@ public class DashboardWindow extends JFrame {
 
     public DashboardWindow(Connection conn) throws SQLException {
         this.produitDAO = new ProduitDAO(conn);
+        this.venteService = new VenteService(conn);
+
         setTitle("Boutika - Gestion Commerciale");
         setSize(1000, 562);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -135,7 +140,7 @@ public class DashboardWindow extends JFrame {
 
     private void openNewTransactionTab() {
         String tabName = "Client " + transactionCounter++;
-        JPanel panel = new TransactionPanel(this.produitDAO, this);
+        JPanel panel = new TransactionPanel(this.produitDAO, this.venteService, this);
         tabbedPane.addTab(tabName, panel);
         tabbedPane.setSelectedComponent(panel);
     }

@@ -1,4 +1,4 @@
-package io.anisthesie.db;
+package io.anisthesie.db.dto;
 
 import java.util.Random;
 
