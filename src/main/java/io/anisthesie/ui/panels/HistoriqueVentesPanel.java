@@ -4,6 +4,7 @@ import io.anisthesie.db.dao.VenteDAO;
 import io.anisthesie.db.dao.VenteProduitsDAO;
 import io.anisthesie.db.dto.VenteDTO;
 import io.anisthesie.db.dto.VenteProduitsDTO;
+import io.anisthesie.ui.panels.components.RoundedPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +24,7 @@ public class HistoriqueVentesPanel extends JPanel {
     private final JButton loadMoreButton;
     private final JButton closeButton;
 
-    private final int DAYS_PER_BATCH = 3;
+    private final int DAYS_PER_BATCH = 10;
     private List<LocalDate> allDates;
     private Map<LocalDate, List<VenteDTO>> ventesParJour;
     private int loadedDaysCount = 0;
@@ -34,30 +35,11 @@ public class HistoriqueVentesPanel extends JPanel {
 
         // Set the main panel layout and background (dark mode)
         setLayout(new BorderLayout());
-        setBackground(new Color(30, 30, 40));
-
-        // Create a header panel for the refresh button with rounded corners
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-
-        // Create the refresh button with improved styling and rounded corners
-        JButton refreshBtn = new JButton("Actualiser l'historique");
-        refreshBtn.setFont(new Font("SansSerif", Font.BOLD, 20));
-        refreshBtn.setFocusPainted(false);
-        refreshBtn.setBorderPainted(true);
-        refreshBtn.setContentAreaFilled(true);
-        refreshBtn.setBackground(new Color(52, 152, 219));
-        refreshBtn.setForeground(Color.WHITE);
-        refreshBtn.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
-        // Make the button rounded
-        refreshBtn.addActionListener(e -> refresh());
-
-        headerPanel.add(refreshBtn, BorderLayout.CENTER);
 
         // Create the content panel with improved styling (dark mode)
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 45, 15));
 
         // Create a scroll pane with improved styling
         JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -67,32 +49,28 @@ public class HistoriqueVentesPanel extends JPanel {
         scrollPane.getViewport().setBackground(contentPanel.getBackground());
 
         // Add components to the main panel
-        add(headerPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
         // Create the "Load More" button with improved styling and rounded corners
         loadMoreButton = new JButton("Voir plus de jours");
-        loadMoreButton.setFont(new Font("SansSerif", Font.BOLD, 20));
+        loadMoreButton.setFont(new Font("SansSerif", Font.BOLD, 28));
         loadMoreButton.setFocusPainted(false);
-        loadMoreButton.setBackground(new Color(52, 152, 219));
+        loadMoreButton.setBackground(new Color(46, 204, 113));
         loadMoreButton.setForeground(Color.WHITE);
-        loadMoreButton.setBorderPainted(true);
-        loadMoreButton.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         loadMoreButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         // Make the button rounded
         loadMoreButton.addActionListener(e -> loadMoreDays());
 
         // Create the "Close" button with improved styling and rounded corners
         closeButton = new JButton("Fermer l'historique");
-        closeButton.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        closeButton.setFont(new Font("SansSerif", Font.BOLD, 22));
         closeButton.setFocusPainted(false);
-        closeButton.setBackground(new Color(44, 62, 80));
+        closeButton.setBackground(new Color(204, 46, 51));
         closeButton.setForeground(Color.WHITE);
-        closeButton.setBorderPainted(true);
-        closeButton.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         // Make the button rounded
         closeButton.addActionListener(e -> closeSelf());
+
 
         // Initialize the panel
         refresh();
@@ -107,7 +85,7 @@ public class HistoriqueVentesPanel extends JPanel {
             // Show a loading message while fetching data (dark mode)
             JLabel loadingLabel = new JLabel("Chargement de l'historique des ventes...");
             loadingLabel.setFont(new Font("SansSerif", Font.ITALIC, 16));
-            loadingLabel.setForeground(new Color(200, 200, 220));
+            loadingLabel.setForeground(Color.WHITE);
             loadingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             contentPanel.add(Box.createVerticalStrut(20));
             contentPanel.add(loadingLabel);
@@ -129,7 +107,7 @@ public class HistoriqueVentesPanel extends JPanel {
             if (allDates.isEmpty()) {
                 JLabel emptyLabel = new JLabel("Aucune vente trouvée dans l'historique");
                 emptyLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-                emptyLabel.setForeground(new Color(200, 200, 220));
+                emptyLabel.setForeground(Color.WHITE);
                 emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
                 contentPanel.add(Box.createVerticalStrut(30));
                 contentPanel.add(emptyLabel);
@@ -187,9 +165,8 @@ public class HistoriqueVentesPanel extends JPanel {
 
         // Create a panel for the buttons with rounded corners (dark mode)
         JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.Y_AXIS));
+        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.X_AXIS));
         buttonsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        buttonsPanel.setBackground(new Color(35, 35, 45));
 
         // Add vertical spacing
         contentPanel.add(Box.createVerticalStrut(20));
@@ -198,8 +175,8 @@ public class HistoriqueVentesPanel extends JPanel {
         if (loadedDaysCount < allDates.size()) {
             // Add a label showing how many more days are available (dark mode)
             JLabel remainingLabel = new JLabel((allDates.size() - loadedDaysCount) + " jours supplémentaires disponibles");
-            remainingLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
-            remainingLabel.setForeground(new Color(200, 200, 220));
+            remainingLabel.setFont(new Font("SansSerif", Font.ITALIC, 18));
+            remainingLabel.setForeground(Color.WHITE);
             remainingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             buttonsPanel.add(remainingLabel);
             buttonsPanel.add(Box.createVerticalStrut(5));
@@ -233,27 +210,34 @@ public class HistoriqueVentesPanel extends JPanel {
         }
     }
 
-
     private JPanel createJourPanel(LocalDate date, List<VenteDTO> ventesDuJour) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(60, 60, 70)), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(60, 60, 70)),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
 
         // Format the date in a more readable format
-        String formattedDate = date.getDayOfWeek().toString().substring(0, 1) + date.getDayOfWeek().toString().substring(1).toLowerCase() + " " + date.getDayOfMonth() + " " + date.getMonth().toString().substring(0, 1) + date.getMonth().toString().substring(1).toLowerCase() + " " + date.getYear();
+        String formattedDate = date.getDayOfWeek().toString().substring(0, 1) +
+                date.getDayOfWeek().toString().substring(1).toLowerCase() +
+                " " + date.getDayOfMonth() + " " +
+                date.getMonth().toString().substring(0, 1) +
+                date.getMonth().toString().substring(1).toLowerCase() +
+                " " + date.getYear();
 
         // Create a panel for the header with rounded corners (dark mode)
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(142, 68, 173)); // Purple color that complements the dark theme
-        // Use a simple approach to make the panel appear rounded
-
+        RoundedPanel headerPanel = new RoundedPanel(new BorderLayout(), 30, 30, new Color(52, 152, 219));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Create the toggle button with an expandable indicator and rounded corners
         JButton toggleBtn = new JButton("▶ " + formattedDate + " (" + ventesDuJour.size() + " ventes)");
         toggleBtn.setFont(new Font("SansSerif", Font.BOLD, 22));
         toggleBtn.setFocusPainted(false);
+        toggleBtn.setBorderPainted(true);
         toggleBtn.setContentAreaFilled(false);
         toggleBtn.setForeground(Color.WHITE);
         toggleBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        toggleBtn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
         // Make the button rounded
 
         // Add the header panel to the main panel
@@ -263,6 +247,7 @@ public class HistoriqueVentesPanel extends JPanel {
         JPanel ventesPanel = new JPanel();
         ventesPanel.setLayout(new BoxLayout(ventesPanel, BoxLayout.Y_AXIS));
         // ventesPanel.setBackground(new Color(45, 45, 55));
+        ventesPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         ventesPanel.setVisible(false);
 
         // Add action listener to toggle visibility and change the indicator
@@ -286,8 +271,8 @@ public class HistoriqueVentesPanel extends JPanel {
     }
 
     private JPanel createVentePanel(VenteDTO vente) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(50, 50, 60));
+        RoundedPanel panel = new RoundedPanel(new BorderLayout(), 30, 30,new Color(45, 45, 55));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Format the time and total for better readability
         String time = vente.getDate().toLocalTime().toString();
@@ -295,17 +280,21 @@ public class HistoriqueVentesPanel extends JPanel {
 
         // Create a panel for the sale header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(44, 62, 80));
+        headerPanel.setBackground(new Color(74, 74, 90, 255));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
 
         // Create the title with an expandable indicator
-        String title = String.format("▶ Vente #%d - %s - Total: %s", vente.getId(), time, formattedTotal);
+        String title = String.format("▶ Vente #%d - %s - Total: %s",
+                vente.getId(), time, formattedTotal);
 
         JButton detailsBtn = new JButton(title);
         detailsBtn.setFont(new Font("SansSerif", Font.PLAIN, 18));
         detailsBtn.setFocusPainted(false);
+        detailsBtn.setBorderPainted(true);
         detailsBtn.setContentAreaFilled(false);
         detailsBtn.setForeground(Color.WHITE);
         detailsBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        detailsBtn.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         // Make the button rounded
 
         headerPanel.add(detailsBtn, BorderLayout.CENTER);
@@ -314,6 +303,7 @@ public class HistoriqueVentesPanel extends JPanel {
         JPanel produitsPanel = new JPanel();
         produitsPanel.setLayout(new BoxLayout(produitsPanel, BoxLayout.Y_AXIS));
         produitsPanel.setBackground(new Color(45, 45, 55));
+        produitsPanel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 5));
         produitsPanel.setVisible(false);
 
         // Add action listener to toggle visibility and change the indicator
@@ -327,6 +317,7 @@ public class HistoriqueVentesPanel extends JPanel {
                     JLabel countLabel = new JLabel(produits.size() + " produit(s)");
                     countLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
                     countLabel.setForeground(new Color(200, 200, 220));
+                    countLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 10, 0));
                     produitsPanel.add(countLabel);
 
                     // Add each product
@@ -342,7 +333,8 @@ public class HistoriqueVentesPanel extends JPanel {
             produitsPanel.setVisible(isVisible);
 
             // Change the arrow icon based on expanded/collapsed state
-            String updatedTitle = String.format("%s Vente #%d - %s - Total: %s", (isVisible ? "▼" : "▶"), vente.getId(), time, formattedTotal);
+            String updatedTitle = String.format("%s Vente #%d - %s - Total: %s",
+                    (isVisible ? "▼" : "▶"), vente.getId(), time, formattedTotal);
             detailsBtn.setText(updatedTitle);
 
             revalidate();
@@ -356,7 +348,10 @@ public class HistoriqueVentesPanel extends JPanel {
 
     private JPanel createProduitPanel(VenteProduitsDTO vp) {
         JPanel panel = new JPanel(new BorderLayout());
-
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(70, 70, 80)),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)
+        ));
         panel.setBackground(new Color(55, 55, 65));
 
         // Calculate the total price for this product
@@ -378,17 +373,17 @@ public class HistoriqueVentesPanel extends JPanel {
         // Add quantity information
         JLabel quantityLabel = new JLabel("Quantité: " + vp.getQuantite());
         quantityLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        quantityLabel.setForeground(new Color(200, 200, 210));
+        quantityLabel.setForeground(Color.WHITE);
 
         // Add unit price information
         JLabel priceLabel = new JLabel("Prix unitaire: " + String.format("%.2f DA", vp.getPrixUnitaire()));
         priceLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        priceLabel.setForeground(new Color(200, 200, 210));
+        priceLabel.setForeground(Color.WHITE);
 
         // Add total price information
         JLabel totalLabel = new JLabel("Total: " + String.format("%.2f DA", totalPrice));
         totalLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
-        totalLabel.setForeground(new Color(230, 230, 240));
+        totalLabel.setForeground(Color.WHITE);
 
         // Add all components to the panels
         detailsPanel.add(quantityLabel);
