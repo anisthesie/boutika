@@ -13,7 +13,7 @@ public class RoundedPanel extends JPanel {
         this.arcWidth = arcWidth;
         this.arcHeight = arcHeight;
         this.backgroundColor = bgColor;
-        setOpaque(false); // Important pour voir l'arrondi
+        setOpaque(false); 
     }
 
     public RoundedPanel(int arc, Color bgColor) {

@@ -9,7 +9,7 @@ public class DatabaseInitializer {
     public static void initTables(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement()) {
 
-            // Table ventes
+            
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS ventes (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +18,7 @@ public class DatabaseInitializer {
                         );
                     """);
 
-            // Table vente_produits
+            
             stmt.execute("""
                         CREATE TABLE IF NOT EXISTS vente_produits (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +31,7 @@ public class DatabaseInitializer {
                         );
                     """);
 
-            // Table produits
+            
             stmt.execute("CREATE TABLE IF NOT EXISTS produit (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "nom TEXT, prix REAL, stock INTEGER)");

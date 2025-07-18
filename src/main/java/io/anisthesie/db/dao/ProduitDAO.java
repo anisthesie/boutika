@@ -9,7 +9,7 @@ import java.util.List;
 public class ProduitDAO {
     private final Connection conn;
 
-    public ProduitDAO(Connection conn) throws SQLException {
+    public ProduitDAO(Connection conn) {
         this.conn = conn;
     }
 
