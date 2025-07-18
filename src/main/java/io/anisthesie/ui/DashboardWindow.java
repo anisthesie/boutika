@@ -69,9 +69,9 @@ public class DashboardWindow extends JFrame {
     private JPanel initLeftPanel() {
         
         JButton btnNew = createButton("Nouvelle Vente", new Color(46, 204, 113), 32, 240,e -> openNewTransactionTab());
-        JButton btnHistorique = createButton("Historique des ventes", new Color(52, 152, 219), 20, 60,e -> openHistoriqueTab());
-        JButton btnPrint = createButton("Imprimer Journée", new Color(241, 196, 15), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Imprimer journée"));
-        JButton btnStock = createButton("Ajouter Stock", new Color(155, 89, 182), 20, 60,e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
+        JButton btnHistorique = createButton("Historique des ventes", new Color(52, 152, 219), 22, 100,e -> openHistoriqueTab());
+        JButton btnPrint = createButton("Imprimer Journée", new Color(241, 196, 15), 22, 100,e -> JOptionPane.showMessageDialog(this, "TODO: Imprimer journée"));
+        JButton btnStock = createButton("Ajouter Stock", new Color(155, 89, 182), 22, 100,e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
 
         
         JPanel clockPanel = initClockPanel();
