@@ -53,7 +53,7 @@ public class DashboardWindow extends JFrame {
     private void initUI() {
         JPanel buttonPanel = initLeftPanel();
 
-        
+
         tabbedPane.setFont(new Font("SansSerif", Font.PLAIN, 18));
 
         JSplitPane horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buttonPanel, tabbedPane);
@@ -67,20 +67,19 @@ public class DashboardWindow extends JFrame {
     }
 
     private JPanel initLeftPanel() {
-        
-        JButton btnNew = createButton("Nouvelle Vente", new Color(46, 204, 113), 32, 240,e -> openNewTransactionTab());
-        JButton btnHistorique = createButton("Historique des ventes", new Color(52, 152, 219), 22, 100,e -> openHistoriqueTab());
-        JButton btnPrint = createButton("Imprimer Journée", new Color(241, 196, 15), 22, 100,e -> JOptionPane.showMessageDialog(this, "TODO: Imprimer journée"));
-        JButton btnStock = createButton("Ajouter Stock", new Color(155, 89, 182), 22, 100,e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
 
-        
+        JButton btnNew = createButton("Nouvelle Vente", new Color(46, 204, 113), 32, 240, e -> openNewTransactionTab());
+        JButton btnHistorique = createButton("Historique des ventes", new Color(52, 152, 219), 22, 100, e -> openHistoriqueTab());
+        JButton btnPrint = createButton("Voir journée", new Color(241, 196, 15), 22, 100, e -> openVentesJourTab());
+        JButton btnStock = createButton("Ajouter Stock", new Color(155, 89, 182), 22, 100, e -> JOptionPane.showMessageDialog(this, "TODO: Exporter recettes"));
+
+
         JPanel clockPanel = initClockPanel();
 
-        
+
         JButton fullscreenBtn = initFullscreenBtn();
 
 
-        
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
@@ -146,8 +145,9 @@ public class DashboardWindow extends JFrame {
         btn.addActionListener(actionListener);
         return btn;
     }
+
     public void openHistoriqueTab() {
-        
+
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             Component tab = tabbedPane.getComponentAt(i);
             if (tab instanceof HistoriqueVentesPanel) {
@@ -155,7 +155,7 @@ public class DashboardWindow extends JFrame {
                 break;
             }
         }
-        
+
         HistoriqueVentesPanel panel = new HistoriqueVentesPanel(venteDAO, venteProduitsDAO);
         tabbedPane.addTab("Historique des ventes", panel);
         tabbedPane.setSelectedComponent(panel);
@@ -204,6 +204,21 @@ public class DashboardWindow extends JFrame {
                 });
             }
         }, 0, 1000);
+    }
+
+
+    public void openVentesJourTab() {
+
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            Component tab = tabbedPane.getComponentAt(i);
+            if (tab instanceof io.anisthesie.ui.panels.VentesJourPanel) {
+                tabbedPane.removeTabAt(i);
+                break;
+            }
+        }
+        io.anisthesie.ui.panels.VentesJourPanel panel = new io.anisthesie.ui.panels.VentesJourPanel(venteDAO, venteProduitsDAO);
+        tabbedPane.addTab("Ventes du jour", panel);
+        tabbedPane.setSelectedComponent(panel);
     }
 
     public JTabbedPane getTabbedPane() {

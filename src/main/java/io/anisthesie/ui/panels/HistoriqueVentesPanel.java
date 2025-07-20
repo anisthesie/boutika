@@ -36,20 +36,23 @@ public class HistoriqueVentesPanel extends JPanel {
 
         
         setLayout(new BorderLayout());
+        setBackground(Color.BLACK);
 
         
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 45, 15));
+        contentPanel.setBackground(Color.BLACK);
 
         JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setBackground(Color.BLACK);
         wrapperPanel.add(contentPanel, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(wrapperPanel);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        scrollPane.setBackground(contentPanel.getBackground());
-        scrollPane.getViewport().setBackground(contentPanel.getBackground());
+        scrollPane.setBackground(Color.BLACK);
+        scrollPane.getViewport().setBackground(Color.BLACK);
 
         add(scrollPane, BorderLayout.CENTER);
 
@@ -68,7 +71,7 @@ public class HistoriqueVentesPanel extends JPanel {
         closeButton = new JButton("Fermer l'historique");
         closeButton.setFont(new Font("SansSerif", Font.BOLD, 22));
         closeButton.setFocusPainted(false);
-        closeButton.setBackground(new Color(204, 46, 51));
+        closeButton.setBackground(new Color(231, 76, 60));
         closeButton.setForeground(Color.WHITE);
         closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         
@@ -212,8 +215,15 @@ public class HistoriqueVentesPanel extends JPanel {
         }
     }
 
+    private double getTotalJournee(LocalDate date) {
+        List<VenteDTO> ventes = ventesParJour.get(date);
+        if (ventes == null) return 0;
+        return ventes.stream().mapToDouble(VenteDTO::getTotal).sum();
+    }
+
     private JPanel createJourPanel(LocalDate date, List<VenteDTO> ventesDuJour) {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.BLACK);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(60, 60, 70)),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
@@ -228,7 +238,7 @@ public class HistoriqueVentesPanel extends JPanel {
                 " " + date.getYear();
 
         
-        RoundedPanel headerPanel = new RoundedPanel(new BorderLayout(), 30, 30, new Color(52, 152, 219));
+        RoundedPanel headerPanel = new RoundedPanel(new BorderLayout(), 30, 30, new Color(25, 25, 25));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         
@@ -240,40 +250,44 @@ public class HistoriqueVentesPanel extends JPanel {
         toggleBtn.setForeground(Color.WHITE);
         toggleBtn.setHorizontalAlignment(SwingConstants.LEFT);
         toggleBtn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        
-
-        
         headerPanel.add(toggleBtn, BorderLayout.CENTER);
 
-        
         JPanel ventesPanel = new JPanel();
         ventesPanel.setLayout(new BoxLayout(ventesPanel, BoxLayout.Y_AXIS));
-        
         ventesPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         ventesPanel.setVisible(false);
 
-        
+        // Total panel (hidden by défaut)
+        JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        totalPanel.setBackground(Color.BLACK);
+        double totalJournee = getTotalJournee(date);
+        JLabel totalLabel = new JLabel(String.format("Total de la journée : %.2f DA", totalJournee));
+        totalLabel.setFont(new Font("SansSerif", Font.BOLD, 17));
+        totalLabel.setForeground(new Color(39, 174, 96));
+        totalPanel.add(totalLabel);
+        totalPanel.setVisible(false);
+
         toggleBtn.addActionListener((ActionEvent e) -> {
             boolean isVisible = !ventesPanel.isVisible();
             ventesPanel.setVisible(isVisible);
-            
+            totalPanel.setVisible(isVisible);
             toggleBtn.setText((isVisible ? "▼ " : "▶ ") + formattedDate + " (" + ventesDuJour.size() + " ventes)");
             revalidate();
             repaint();
         });
 
-        
         for (VenteDTO vente : ventesDuJour) {
             ventesPanel.add(createVentePanel(vente));
         }
 
         panel.add(headerPanel, BorderLayout.NORTH);
         panel.add(ventesPanel, BorderLayout.CENTER);
+        panel.add(totalPanel, BorderLayout.SOUTH);
         return panel;
     }
 
     private JPanel createVentePanel(VenteDTO vente) {
-        RoundedPanel panel = new RoundedPanel(new BorderLayout(), 30, 30, new Color(45, 45, 55));
+        RoundedPanel panel = new RoundedPanel(new BorderLayout(), 30, 30, new Color(25, 25, 25));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         
@@ -282,7 +296,7 @@ public class HistoriqueVentesPanel extends JPanel {
 
         
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(74, 74, 90, 255));
+        headerPanel.setBackground(new Color(25, 25, 25));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
 
         
@@ -294,7 +308,7 @@ public class HistoriqueVentesPanel extends JPanel {
         detailsBtn.setFocusPainted(false);
         detailsBtn.setBorderPainted(true);
         detailsBtn.setContentAreaFilled(false);
-        detailsBtn.setForeground(Color.WHITE);
+        detailsBtn.setForeground(new Color(113, 198, 255));
         detailsBtn.setHorizontalAlignment(SwingConstants.LEFT);
         detailsBtn.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
         
@@ -304,7 +318,7 @@ public class HistoriqueVentesPanel extends JPanel {
         
         JPanel produitsPanel = new JPanel();
         produitsPanel.setLayout(new BoxLayout(produitsPanel, BoxLayout.Y_AXIS));
-        produitsPanel.setBackground(new Color(45, 45, 55));
+        produitsPanel.setBackground(new Color(35, 35, 35));
         produitsPanel.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 5));
         produitsPanel.setVisible(false);
 
@@ -354,7 +368,7 @@ public class HistoriqueVentesPanel extends JPanel {
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(70, 70, 80)),
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)
         ));
-        panel.setBackground(new Color(55, 55, 65));
+        panel.setBackground(new Color(35, 35, 35));
 
         
         double totalPrice = vp.getQuantite() * vp.getPrixUnitaire();
@@ -366,7 +380,7 @@ public class HistoriqueVentesPanel extends JPanel {
         
         JLabel nameLabel = new JLabel(vp.getNomProduit());
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
-        nameLabel.setForeground(new Color(220, 220, 230));
+        nameLabel.setForeground(new Color(220, 220, 220));
 
         
         JPanel detailsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
@@ -375,17 +389,17 @@ public class HistoriqueVentesPanel extends JPanel {
         
         JLabel quantityLabel = new JLabel("Quantité: " + vp.getQuantite());
         quantityLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        quantityLabel.setForeground(Color.WHITE);
+        quantityLabel.setForeground(new Color(200, 200, 200));
 
         
         JLabel priceLabel = new JLabel("Prix unitaire: " + String.format("%.2f DA", vp.getPrixUnitaire()));
         priceLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        priceLabel.setForeground(Color.WHITE);
+        priceLabel.setForeground(new Color(200, 200, 200));
 
         
         JLabel totalLabel = new JLabel("Total: " + String.format("%.2f DA", totalPrice));
         totalLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
-        totalLabel.setForeground(Color.WHITE);
+        totalLabel.setForeground(new Color(39, 174, 96));
 
         
         detailsPanel.add(quantityLabel);
@@ -399,3 +413,4 @@ public class HistoriqueVentesPanel extends JPanel {
         return panel;
     }
 }
+

@@ -53,5 +53,19 @@ public class VenteDAO {
         }
         return grouped;
     }
-}
 
+    public List<VenteDTO> getVentesDuJour() throws SQLException {
+        String sql = "SELECT id, date, total FROM ventes WHERE DATE(date) = CURRENT_DATE ORDER BY date ASC";
+        List<VenteDTO> ventes = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                LocalDateTime date = rs.getTimestamp("date").toLocalDateTime();
+                double total = rs.getDouble("total");
+                ventes.add(new VenteDTO(id, date, total));
+            }
+        }
+        return ventes;
+    }
+}
