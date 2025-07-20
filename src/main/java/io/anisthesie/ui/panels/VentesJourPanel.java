@@ -4,19 +4,21 @@ import io.anisthesie.db.dao.VenteDAO;
 import io.anisthesie.db.dao.VenteProduitsDAO;
 import io.anisthesie.db.dto.VenteDTO;
 import io.anisthesie.db.dto.VenteProduitsDTO;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class VentesJourPanel extends JPanel {
     private final VenteDAO venteDAO;
@@ -78,13 +80,7 @@ public class VentesJourPanel extends JPanel {
                 DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
                 double totalJour = 0;
                 for (VenteDTO vente : ventes) {
-                    JPanel ventePanel = new JPanel();
-                    ventePanel.setLayout(new BoxLayout(ventePanel, BoxLayout.Y_AXIS));
-                    ventePanel.setBackground(new Color(25, 25, 25));
-                    ventePanel.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(60, 60, 60), 1),
-                        BorderFactory.createEmptyBorder(12, 18, 12, 18)));
-                    ventePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    JPanel ventePanel = creerVentePanel();
                     JLabel header = new JLabel(String.format("Vente #%d   |   %s   |   Total: %.2f DA",
                             vente.getId(),
                             vente.getDate().toLocalTime().format(timeFmt),
@@ -145,6 +141,17 @@ public class VentesJourPanel extends JPanel {
         repaint();
     }
 
+    private static JPanel creerVentePanel() {
+        JPanel ventePanel = new JPanel();
+        ventePanel.setLayout(new BoxLayout(ventePanel, BoxLayout.Y_AXIS));
+        ventePanel.setBackground(new Color(25, 25, 25));
+        ventePanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(60, 60, 60), 1),
+                BorderFactory.createEmptyBorder(12, 18, 12, 18)));
+        ventePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return ventePanel;
+    }
+
     private void genererExcel(ActionEvent e) {
         try {
             List<VenteDTO> ventes = venteDAO.getVentesDuJour();
@@ -157,8 +164,8 @@ public class VentesJourPanel extends JPanel {
             String userHome = System.getProperty("user.home");
             java.io.File desktop = new java.io.File(userHome, "Desktop");
             fileChooser.setCurrentDirectory(desktop);
-            String defaultName = "ventes_jour_" + java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
-            fileChooser.setSelectedFile(new java.io.File(desktop, defaultName));
+            String defaultName = "ventes_jour_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            fileChooser.setSelectedFile(new File(desktop, defaultName));
             fileChooser.setDialogTitle("Enregistrer sous");
             fileChooser.setFileFilter(new FileNameExtensionFilter("Fichier Excel (*.xlsx)", "xlsx"));
             if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
