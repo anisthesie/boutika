@@ -153,6 +153,12 @@ public class VentesJourPanel extends JPanel {
                 return;
             }
             JFileChooser fileChooser = new JFileChooser();
+            // Définit le bureau comme dossier par défaut
+            String userHome = System.getProperty("user.home");
+            java.io.File desktop = new java.io.File(userHome, "Desktop");
+            fileChooser.setCurrentDirectory(desktop);
+            String defaultName = "ventes_jour_" + java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            fileChooser.setSelectedFile(new java.io.File(desktop, defaultName));
             fileChooser.setDialogTitle("Enregistrer sous");
             fileChooser.setFileFilter(new FileNameExtensionFilter("Fichier Excel (*.xlsx)", "xlsx"));
             if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
