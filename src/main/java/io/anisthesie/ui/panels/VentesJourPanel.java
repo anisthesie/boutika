@@ -35,10 +35,16 @@ public class VentesJourPanel extends JPanel {
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Color.BLACK);
-        JScrollPane scrollPane = new JScrollPane(contentPanel);
+
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setBackground(Color.BLACK);
+        wrapperPanel.add(contentPanel, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(wrapperPanel);
+        scrollPane.setBorder(null);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setBackground(Color.BLACK);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -81,10 +87,7 @@ public class VentesJourPanel extends JPanel {
                 double totalJour = 0;
                 for (VenteDTO vente : ventes) {
                     JPanel ventePanel = creerVentePanel();
-                    JLabel header = new JLabel(String.format("Vente #%d   |   %s   |   Total: %.2f DA",
-                            vente.getId(),
-                            vente.getDate().toLocalTime().format(timeFmt),
-                            vente.getTotal()));
+                    JLabel header = new JLabel(String.format("Vente #%d   |   %s   |   Total: %.2f DA", vente.getId(), vente.getDate().toLocalTime().format(timeFmt), vente.getTotal()));
                     header.setFont(new Font("SansSerif", Font.BOLD, 17));
                     header.setForeground(new Color(41, 128, 185));
                     ventePanel.add(header);
@@ -145,9 +148,7 @@ public class VentesJourPanel extends JPanel {
         JPanel ventePanel = new JPanel();
         ventePanel.setLayout(new BoxLayout(ventePanel, BoxLayout.Y_AXIS));
         ventePanel.setBackground(new Color(25, 25, 25));
-        ventePanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(60, 60, 60), 1),
-                BorderFactory.createEmptyBorder(12, 18, 12, 18)));
+        ventePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(60, 60, 60), 1), BorderFactory.createEmptyBorder(12, 18, 12, 18)));
         ventePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         return ventePanel;
     }
