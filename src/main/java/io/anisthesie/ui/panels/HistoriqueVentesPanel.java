@@ -9,6 +9,7 @@ import io.anisthesie.ui.panels.components.RoundedPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -252,6 +253,9 @@ public class HistoriqueVentesPanel extends JPanel {
         totalLabel.setFont(new Font("SansSerif", Font.BOLD, 17));
         totalLabel.setForeground(new Color(39, 174, 96));
         totalPanel.add(totalLabel);
+        JButton excelButton = createExcelButton(date, ventesDuJour);
+        totalPanel.add(Box.createHorizontalStrut(16));
+        totalPanel.add(excelButton);
         totalPanel.setVisible(false);
 
         toggleBtn.addActionListener((ActionEvent e) -> {
@@ -271,6 +275,31 @@ public class HistoriqueVentesPanel extends JPanel {
         panel.add(ventesPanel, BorderLayout.CENTER);
         panel.add(totalPanel, BorderLayout.SOUTH);
         return panel;
+    }
+
+    private JButton createExcelButton(LocalDate date, List<VenteDTO> ventesDuJour) {
+        JButton excelButton = new JButton("Générer Excel");
+        excelButton.setPreferredSize(new Dimension(180, 44));
+        excelButton.setBackground(new Color(46, 204, 113));
+        excelButton.setForeground(Color.WHITE);
+        excelButton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        excelButton.addActionListener(ev -> {
+            String defaultName = "ventes_" + date.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            ExportExcelUtil.exporterVentesExcel(
+                    HistoriqueVentesPanel.this,
+                    ventesDuJour,
+                    vente -> {
+                        try {
+                            return venteProduitsDAO.getProduitsParVente(vente);
+                        } catch (SQLException e) {
+                            return List.of();
+                        }
+                    },
+                    "Ventes du " + date,
+                    defaultName
+            );
+        });
+        return excelButton;
     }
 
     private JPanel createVentePanel(VenteDTO vente) {

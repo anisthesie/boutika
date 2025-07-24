@@ -4,18 +4,11 @@ import io.anisthesie.db.dao.VenteDAO;
 import io.anisthesie.db.dao.VenteProduitsDAO;
 import io.anisthesie.db.dto.VenteDTO;
 import io.anisthesie.db.dto.VenteProduitsDTO;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -156,64 +149,22 @@ public class VentesJourPanel extends JPanel {
     private void genererExcel(ActionEvent e) {
         try {
             List<VenteDTO> ventes = venteDAO.getVentesDuJour();
-            if (ventes.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Aucune vente à exporter.", "Export Excel", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            JFileChooser fileChooser = new JFileChooser();
-            // Définit le bureau comme dossier par défaut
-            String userHome = System.getProperty("user.home");
-            java.io.File desktop = new java.io.File(userHome, "Desktop");
-            fileChooser.setCurrentDirectory(desktop);
             String defaultName = "ventes_jour_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
-            fileChooser.setSelectedFile(new File(desktop, defaultName));
-            fileChooser.setDialogTitle("Enregistrer sous");
-            fileChooser.setFileFilter(new FileNameExtensionFilter("Fichier Excel (*.xlsx)", "xlsx"));
-            if (fileChooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
-            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-            if (!filePath.endsWith(".xlsx")) filePath += ".xlsx";
-
-            try (Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet("Ventes du jour");
-                Row header = sheet.createRow(0);
-                header.createCell(0).setCellValue("ID Vente");
-                header.createCell(1).setCellValue("Heure");
-                header.createCell(2).setCellValue("Total Vente (DA)");
-                header.createCell(3).setCellValue("Produit");
-                header.createCell(4).setCellValue("Quantité");
-                header.createCell(5).setCellValue("Prix Unitaire (DA)");
-                header.createCell(6).setCellValue("Total Produit (DA)");
-                int rowIdx = 1;
-                double total = 0;
-                DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
-                for (VenteDTO vente : ventes) {
-                    List<VenteProduitsDTO> produits = venteProduitsDAO.getProduitsParVente(vente.getId());
-                    boolean first = true;
-                    for (VenteProduitsDTO produit : produits) {
-                        Row row = sheet.createRow(rowIdx++);
-                        row.createCell(0).setCellValue(vente.getId());
-                        row.createCell(1).setCellValue(vente.getDate().toLocalTime().format(timeFmt));
-                        row.createCell(2).setCellValue(first ? vente.getTotal() : 0);
-                        row.createCell(3).setCellValue(produit.getNomProduit());
-                        row.createCell(4).setCellValue(produit.getQuantite());
-                        row.createCell(5).setCellValue(produit.getPrixUnitaire());
-                        row.createCell(6).setCellValue(produit.getQuantite() * produit.getPrixUnitaire());
-                        first = false;
-                    }
-                    total += vente.getTotal();
-                }
-                Row totalRow = sheet.createRow(rowIdx);
-                totalRow.createCell(1).setCellValue("Total ventes");
-                totalRow.createCell(2).setCellValue(total);
-                for (int i = 0; i <= 6; i++) sheet.autoSizeColumn(i);
-                try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                    workbook.write(fos);
-                }
-            }
-            JOptionPane.showMessageDialog(this, "Export Excel réussi !", "Export Excel", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Erreur d'écriture du fichier : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
+            ExportExcelUtil.exporterVentesExcel(
+                    this,
+                    ventes,
+                    id -> {
+                        try {
+                            return venteProduitsDAO.getProduitsParVente(id);
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(this, "Erreur lors de la récupération des produits : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                            return List.of();
+                        }
+                    },
+                    "Ventes du jour",
+                    defaultName
+            );
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Erreur lors de l'export : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
