@@ -11,10 +11,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 public class HistoriqueVentesPanel extends JPanel {
 
@@ -223,7 +225,11 @@ public class HistoriqueVentesPanel extends JPanel {
         panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(60, 60, 70)), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
 
-        String formattedDate = date.getDayOfWeek().toString().substring(0, 1) + date.getDayOfWeek().toString().substring(1).toLowerCase() + " " + date.getDayOfMonth() + " " + date.getMonth().toString().substring(0, 1) + date.getMonth().toString().substring(1).toLowerCase() + " " + date.getYear();
+        // Formatage de la date en français
+        String formattedDate = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE)
+                + " " + date.getDayOfMonth() + " "
+                + date.getMonth().getDisplayName(TextStyle.FULL, Locale.FRANCE)
+                + " " + date.getYear();
 
 
         RoundedPanel headerPanel = new RoundedPanel(new BorderLayout(), 30, 30, new Color(25, 25, 25));
@@ -284,7 +290,7 @@ public class HistoriqueVentesPanel extends JPanel {
         excelButton.setForeground(Color.WHITE);
         excelButton.setFont(new Font("SansSerif", Font.BOLD, 18));
         excelButton.addActionListener(ev -> {
-            String defaultName = "ventes_" + date.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            String defaultName = "ventes_" + date.format(java.time.format.DateTimeFormatter.ofPattern("dd_MM_yyyy")) + ".xlsx";
             ExportExcelUtil.exporterVentesExcel(
                     HistoriqueVentesPanel.this,
                     ventesDuJour,

@@ -149,7 +149,7 @@ public class VentesJourPanel extends JPanel {
     private void genererExcel(ActionEvent e) {
         try {
             List<VenteDTO> ventes = venteDAO.getVentesDuJour();
-            String defaultName = "ventes_jour_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".xlsx";
+            String defaultName = "ventes_jour_" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd_MM_yyyy")) + ".xlsx";
             ExportExcelUtil.exporterVentesExcel(
                     this,
                     ventes,
