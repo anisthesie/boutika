@@ -69,16 +69,29 @@ public class ExportExcelUtil {
             totalStyle.setBorderRight(BorderStyle.THIN);
             totalStyle.setAlignment(HorizontalAlignment.RIGHT);
 
-            Row header = sheet.createRow(0);
+            int rowIdx = 1;
+            double total = 0;
+            DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
+            DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            // Afficher la date de la journée en haut
+            Row dateRow = sheet.createRow(rowIdx++);
+            Cell dateLabelCell = dateRow.createCell(0);
+            dateLabelCell.setCellValue("Date de la journée :");
+            dateLabelCell.setCellStyle(headerStyle);
+            Cell dateValueCell = dateRow.createCell(1);
+            if (!ventes.isEmpty()) {
+                dateValueCell.setCellValue(ventes.get(0).getDate().toLocalDate().format(dateFmt));
+            }
+            dateValueCell.setCellStyle(headerStyle);
+            rowIdx++; // Sauter une ligne après la date
+            // En-tête
+            Row header = sheet.createRow(rowIdx++);
             String[] headers = {"ID Vente", "Heure", "Total Vente (DA)", "Produit", "Quantité", "Prix Unitaire (DA)", "Total Produit (DA)"};
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = header.createCell(i);
                 cell.setCellValue(headers[i]);
                 cell.setCellStyle(headerStyle);
             }
-            int rowIdx = 1;
-            double total = 0;
-            DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss");
             for (VenteDTO vente : ventes) {
                 List<VenteProduitsDTO> produits = produitsFetcher.apply(vente.getId());
                 boolean first = true;
@@ -114,12 +127,17 @@ public class ExportExcelUtil {
                     sepCell.setCellStyle(headerStyle);
                     sepCell.setCellValue("");
                 }
-                Cell totalVenteLabel = sepRow.createCell(3);
+                Cell totalVenteLabel = sepRow.createCell(5);
                 totalVenteLabel.setCellValue("Total vente");
                 totalVenteLabel.setCellStyle(headerStyle);
+                Font boldFont = workbook.createFont();
+                boldFont.setBold(true);
+                CellStyle boldStyle = workbook.createCellStyle();
+                boldStyle.cloneStyleFrom(headerStyle);
+                boldStyle.setFont(boldFont);
                 Cell totalVenteValue = sepRow.createCell(6);
                 totalVenteValue.setCellValue(vente.getTotal());
-                totalVenteValue.setCellStyle(headerStyle);
+                totalVenteValue.setCellStyle(boldStyle);
                 total += vente.getTotal();
             }
             Row totalRow = sheet.createRow(rowIdx);
